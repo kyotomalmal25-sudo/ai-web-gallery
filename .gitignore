@@ -1,0 +1,19 @@
+# Local credentials and environment overrides
+.env
+.env.*
+!.env.example
+
+# Local tooling and generated output
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+*.log
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Local-only Supabase exports
+supabase/.temp/
