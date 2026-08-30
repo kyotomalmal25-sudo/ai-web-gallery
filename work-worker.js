@@ -15,6 +15,7 @@ const FIELD_MAP = Object.freeze({
 });
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const STATIC_WORK_ROUTES = new Set(['shrimp-garden', 'grok5']);
 const BUCKET = 'ai-works';
 const SIDECAR_TYPES = {
   'metadata.json': 'application/json; charset=utf-8',
@@ -89,9 +90,20 @@ async function handleWork(request, env, url) {
   if (parts.length < 2 || parts[0] !== 'work') return null;
   const id = decodeURIComponent(parts[1]);
   const fileName = parts[2] || '';
+
+  // Preserve the two existing static work pages. Every other /work/<id>
+  // route must be resolved from Supabase instead of falling through to ASSETS.
+  if (STATIC_WORK_ROUTES.has(id)) return env.ASSETS.fetch(request);
+  if (!UUID_RE.test(id)) return response('Not Found', 404, {'content-type': 'text/plain; charset=utf-8'});
+
   let work;
-  try { work = await findWork(id, env); } catch (error) { console.error(error); }
-  if (!work) return env.ASSETS.fetch(request);
+  try {
+    work = await findWork(id, env);
+  } catch (error) {
+    console.error(error);
+    return response('Upstream error', 502, {'content-type': 'text/plain; charset=utf-8'});
+  }
+  if (!work) return response('Not Found', 404, {'content-type': 'text/plain; charset=utf-8'});
   if (!fileName) return renderWorkPage(work, id, env);
   if (fileName === 'metadata.json') return response(JSON.stringify(metadataFor(work, id, env), null, 2), 200, {'content-type': 'application/json; charset=utf-8'});
   if (fileName === 'prompt.txt' || fileName === 'memo.txt') {
