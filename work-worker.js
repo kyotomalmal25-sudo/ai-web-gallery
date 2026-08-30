@@ -52,6 +52,57 @@ async function findWork(id, env) {
   return (await result.json())[0] || null;
 }
 
+async function listWorks(env) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return null;
+  const url = new URL(`${supabaseBase(env)}/rest/v1/${FIELD_MAP.table}`);
+  url.searchParams.set('select', [FIELD_MAP.id, FIELD_MAP.title, FIELD_MAP.ai, FIELD_MAP.model, FIELD_MAP.date].join(','));
+  url.searchParams.set('order', `${FIELD_MAP.date}.desc,created_at.desc,${FIELD_MAP.id}.asc`);
+  const result = await fetch(url, {headers: {
+    apikey: env.SUPABASE_ANON_KEY,
+    Authorization: `Bearer ${env.SUPABASE_ANON_KEY}`,
+    Accept: 'application/json',
+  }});
+  if (!result.ok) throw new Error(`Supabase returned ${result.status}`);
+  return await result.json();
+}
+
+function renderStaticWorkList(works) {
+  const items = works.filter((work) => UUID_RE.test(String(work[FIELD_MAP.id] || ''))).map((work) => {
+    const id = String(work[FIELD_MAP.id]);
+    return `<li><a href="/work/${encodeURIComponent(id)}/">${escapeHtml(work[FIELD_MAP.title])}</a> — AI: ${escapeHtml(work[FIELD_MAP.ai])} — Model: ${escapeHtml(work[FIELD_MAP.model])} — Date: ${escapeHtml(work[FIELD_MAP.date])}</li>`;
+  }).join('');
+  return `<section id="static-work-list" hidden><h2>AI Works 全作品一覧</h2><ul>${items}</ul></section>`;
+}
+
+async function renderRoot(request, env) {
+  const assetResponse = await env.ASSETS.fetch(new Request(request.url, {method: 'GET', headers: request.headers}));
+  if (!assetResponse.ok || request.method !== 'GET' && request.method !== 'HEAD') return assetResponse;
+
+  let works;
+  try {
+    works = await listWorks(env);
+  } catch (error) {
+    console.error(error);
+    return request.method === 'HEAD'
+      ? new Response(null, {status: assetResponse.status, headers: assetResponse.headers})
+      : assetResponse;
+  }
+
+  const source = await assetResponse.text();
+  const staticList = renderStaticWorkList(Array.isArray(works) ? works : []);
+  const html = source.includes('</body>')
+    ? source.replace('</body>', `${staticList}</body>`)
+    : `${source}${staticList}`;
+  const headers = new Headers(assetResponse.headers);
+  headers.delete('content-length');
+  headers.delete('content-encoding');
+  headers.delete('etag');
+  headers.set('content-type', 'text/html; charset=utf-8');
+  return request.method === 'HEAD'
+    ? new Response(null, {status: assetResponse.status, headers})
+    : new Response(html, {status: assetResponse.status, headers});
+}
+
 function storageUrl(id, fileName, env) {
   return `${supabaseBase(env)}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(id)}/${fileName}`;
 }
@@ -116,6 +167,9 @@ async function handleWork(request, env, url) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/' && (request.method === 'GET' || request.method === 'HEAD')) {
+      return renderRoot(request, env);
+    }
     if (url.pathname === '/work' || url.pathname.startsWith('/work/')) {
       const result = await handleWork(request, env, url);
       if (result) {
