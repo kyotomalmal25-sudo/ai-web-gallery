@@ -1,7 +1,7 @@
 /* Supabase seam: work.metadata maps to Database rows; work.files maps to original files in Storage. */
 const defaultWorks = [
-  {id:'grok5',title:'AQUA / GROK 5',model:'Grok 5',ai:'Grok',date:'2026.08.28',prompt:'3D シュリンプアクアリウム',memo:'',kind:'3D / REALTIME',art:'art-a',sample:false,href:'works/grok5.html',infoUrl:'work/grok5/'},
-  {id:'shrimp-aquarium1',title:'SHRIMP GARDEN',model:'GPT-5.6 Sol',ai:'GPT',date:'2026.08.26',prompt:'淡水エビの小宇宙',memo:'',kind:'WEBGL / AQUARIUM',art:'art-b',sample:false,href:'works/shrimp-aquarium1.html',infoUrl:'work/shrimp-garden/'},
+  {id:'83e7b1fa-6c14-450b-afa9-500854317af5',title:'シュリンプアクアリウム',model:'Grok4.5',ai:'Grok',date:'2026.08.30',prompt:'3D シュリンプアクアリウム',memo:'アクアリウムシミュレーター（エビ）AI比較企画。5回修正',kind:'WEB WORK',art:'art-a',sample:false,href:'https://pgybuocqlhltepfnubfr.supabase.co/storage/v1/object/public/ai-works/83e7b1fa-6c14-450b-afa9-500854317af5/index.html'},
+  {id:'8bc53c94-1a7d-4793-98ef-eb3f5cca87de',title:'シュリンプガーデン',model:'5.6 sol',ai:'GPT',date:'2026.08.30',prompt:'淡水エビの小宇宙',memo:'',kind:'WEB WORK',art:'art-b',sample:false,href:'https://pgybuocqlhltepfnubfr.supabase.co/storage/v1/object/public/ai-works/8bc53c94-1a7d-4793-98ef-eb3f5cca87de/index.html'},
   
 ];
 
@@ -77,11 +77,6 @@ function normalizeWork(source) {
   const thumbnailName = raw.files?.thumbnail?.name || raw.thumbnail_name || raw.thumbnailName || fileNameFromUrl(thumbnailSourceUrl) || '';
   const thumbnailDataUrl = raw.files?.thumbnail?.data_url ?? raw.thumbnailData ?? null;
   const thumbnailUrl = raw.files?.thumbnail?.url || thumbnailSourceUrl || (thumbnailDataUrl && thumbnailName ? portableFileUrl(id, thumbnailName) : '');
-  const sourceTitle = String(raw.title || '');
-  const fixedPublicId = raw.infoUrl || raw.info_url || raw.metadata?.info_url || (
-    raw.ai === 'GPT' && /shrimp|シュリンプ|garden/i.test(sourceTitle) ? 'shrimp-garden' :
-    raw.ai === 'Grok' && /shrimp|シュリンプ|aquarium|アクアリウム/i.test(sourceTitle) ? 'grok5' : id
-  );
   const work = {
     id,
     schema_version: PORTABLE_SCHEMA_VERSION,
@@ -94,7 +89,7 @@ function normalizeWork(source) {
     memo: String(raw.memo || ''),
     other: raw.other || raw.other_category,
     art: raw.art || 'art-a',
-    infoUrl: String(fixedPublicId).startsWith('work/') ? String(fixedPublicId) : `work/${encodeURIComponent(fixedPublicId)}/`,
+    infoUrl: `work/${encodeURIComponent(id)}/`,
     sample: raw.sample ?? false,
     files: {
       html: {

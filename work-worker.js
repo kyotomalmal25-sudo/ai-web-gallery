@@ -15,7 +15,10 @@ const FIELD_MAP = Object.freeze({
 });
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const STATIC_WORK_ROUTES = new Set(['shrimp-garden', 'grok5']);
+const LEGACY_WORK_ROUTES = new Map([
+  ['grok5', (work) => work[FIELD_MAP.ai] === 'Grok'],
+  ['shrimp-garden', (work) => work[FIELD_MAP.ai] === 'GPT' && /shrimp|シュリンプ|garden/i.test(String(work[FIELD_MAP.title] || ''))],
+]);
 const BUCKET = 'ai-works';
 const SIDECAR_TYPES = {
   'metadata.json': 'application/json; charset=utf-8',
@@ -55,7 +58,7 @@ async function findWork(id, env) {
 async function listWorks(env) {
   if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return null;
   const url = new URL(`${supabaseBase(env)}/rest/v1/${FIELD_MAP.table}`);
-  url.searchParams.set('select', [FIELD_MAP.id, FIELD_MAP.title, FIELD_MAP.ai, FIELD_MAP.model, FIELD_MAP.date].join(','));
+  url.searchParams.set('select', [FIELD_MAP.id, FIELD_MAP.title, FIELD_MAP.ai, FIELD_MAP.model, FIELD_MAP.date, 'created_at'].join(','));
   url.searchParams.set('order', `${FIELD_MAP.date}.desc,created_at.desc,${FIELD_MAP.id}.asc`);
   const result = await fetch(url, {headers: {
     apikey: env.SUPABASE_ANON_KEY,
@@ -64,6 +67,24 @@ async function listWorks(env) {
   }});
   if (!result.ok) throw new Error(`Supabase returned ${result.status}`);
   return await result.json();
+}
+
+async function redirectLegacyWork(request, env, routeId, suffix) {
+  const matches = LEGACY_WORK_ROUTES.get(routeId);
+  if (!matches) return null;
+  let works;
+  try {
+    works = await listWorks(env);
+  } catch (error) {
+    console.error(error);
+    return response('Upstream error', 502, {'content-type': 'text/plain; charset=utf-8'});
+  }
+  const latest = Array.isArray(works) ? works.find(matches) : null;
+  if (!latest || !UUID_RE.test(String(latest[FIELD_MAP.id] || ''))) {
+    return response('Not Found', 404, {'content-type': 'text/plain; charset=utf-8'});
+  }
+  const target = `/work/${encodeURIComponent(latest[FIELD_MAP.id])}/${suffix ? `${encodeURIComponent(suffix)}` : ''}`;
+  return response(null, 302, {Location: target, 'cache-control': 'no-store'});
 }
 
 function renderStaticWorkList(works) {
@@ -142,9 +163,8 @@ async function handleWork(request, env, url) {
   const id = decodeURIComponent(parts[1]);
   const fileName = parts[2] || '';
 
-  // Preserve the two existing static work pages. Every other /work/<id>
-  // route must be resolved from Supabase instead of falling through to ASSETS.
-  if (STATIC_WORK_ROUTES.has(id)) return env.ASSETS.fetch(request);
+  const legacyRedirect = await redirectLegacyWork(request, env, id, fileName);
+  if (legacyRedirect) return legacyRedirect;
   if (!UUID_RE.test(id)) return response('Not Found', 404, {'content-type': 'text/plain; charset=utf-8'});
 
   let work;
