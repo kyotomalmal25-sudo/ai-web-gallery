@@ -6,7 +6,7 @@ const defaultWorks = [
 ];
 
 const categories = [
-  {key:'GPT', label:'GPT', symbol:'G', icon:'assets/ai-category-gpt.png'},
+  {key:'GPT', label:'ChatGPT', symbol:'G', icon:'assets/ai-category-gpt.png'},
   {key:'Claude', label:'Claude', symbol:'C', icon:'assets/ai-category-claude.png'},
   {key:'Gemini', label:'Gemini', symbol:'Gm', icon:'assets/ai-category-gemini.png'},
   {key:'Grok', label:'Grok', symbol:'X', icon:'assets/ai-category-grok.png'},
