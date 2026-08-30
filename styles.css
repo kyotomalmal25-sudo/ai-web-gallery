@@ -79,10 +79,10 @@ button { cursor: pointer; }
 .category-card:after { content: ''; position: absolute; right: -10px; bottom: 17px; width: 72px; height: 1px; background: var(--selected); transform: rotate(-38deg); transform-origin: right center; opacity: .88; }
 .category-card:hover { transform: translateY(-3px); border-color: var(--secondary); background: #fff; }
 .category-card .category-symbol { display: grid; place-items: center; width: 28px; height: 28px; margin-bottom: 17px; border: 1px solid var(--line); border-radius: 50%; color: var(--primary); font: 600 10px 'DM Mono'; }
-.category-card .category-icon { position: absolute; left: 16px; top: 50%; display: block; width: 42px; height: 42px; object-fit: contain; transform: translateY(-50%); }
-.category-card[data-category="Qwen"] .category-icon { width: 40px; height: 40px; }
+.category-card .category-icon { position: absolute; left: 16px; top: 50%; display: block; width: 46px; height: 46px; object-fit: contain; transform: translateY(-50%); }
+.category-card[data-category="Qwen"] .category-icon { width: 44px; height: 44px; }
 .category-card strong { position: absolute; left: 70px; top: 27px; display: block; font: 700 18px Manrope; letter-spacing: -.035em; }
-.category-count { position: absolute; left: 71px; top: 56px; color: var(--primary); font: 500 13px 'DM Mono'; }
+.category-count { position: absolute; right: 14px; bottom: 12px; color: var(--hover); font: 500 13px 'DM Mono'; }
 .recent-gallery { margin-bottom: 2px; }
 .favorite-summary { display: flex; align-items: center; justify-content: space-between; min-height: 132px; padding: 25px 28px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(105deg, rgba(184, 226, 230, .25), rgba(255, 255, 255, .75)); }
 .favorite-summary > div { display: flex; align-items: center; gap: 18px; }
