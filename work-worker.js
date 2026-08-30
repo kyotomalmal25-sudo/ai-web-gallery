@@ -92,7 +92,7 @@ function renderStaticWorkList(works) {
     const id = String(work[FIELD_MAP.id]);
     return `<li><a href="/work/${encodeURIComponent(id)}/">${escapeHtml(work[FIELD_MAP.title])}</a> — AI: ${escapeHtml(work[FIELD_MAP.ai])} — Model: ${escapeHtml(work[FIELD_MAP.model])} — Date: ${escapeHtml(work[FIELD_MAP.date])}</li>`;
   }).join('');
-  return `<section id="static-work-list" style="max-width:960px;margin:2rem auto 0;padding:1rem 1.25rem;border-top:1px solid #d8dee6;color:#64748b;font-size:12px;line-height:1.7"><h2 style="margin:0 0 .5rem;font-size:13px;color:#475569">AI Works 全作品一覧</h2><ul style="margin:0;padding-left:1.25rem">${items}</ul></section>`;
+  return `<section id="static-work-list" aria-label="AI Works 全作品一覧"><h2>AI Works 全作品一覧</h2><ul>${items}</ul></section>`;
 }
 
 async function renderRoot(request, env) {

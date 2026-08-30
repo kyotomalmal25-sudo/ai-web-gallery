@@ -291,3 +291,16 @@ html[data-theme="dark"] .home-brand-icon-text { display: block; clip-path: inset
   .theme-options { width: 100%; grid-template-columns: 1fr; }
   .manage-item { align-items: flex-start; flex-direction: column; }
 }
+/* Keep the crawler-readable index in the HTML without adding a second visual card/list. */
+#static-work-list {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
