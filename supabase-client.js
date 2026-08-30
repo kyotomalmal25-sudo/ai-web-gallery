@@ -8,6 +8,7 @@
     : null;
   const table = config.table || 'works';
   const bucket = config.bucket || 'ai-works';
+  const passwordRecoveryRedirectUrl = 'https://banana-needs-no-reason.kyotomalmal25.workers.dev/';
   let passwordRecovery = false;
 
   function requireClient() {
@@ -227,6 +228,12 @@
           throw new Error('ADMIN_REQUIRED');
         }
         return data.session;
+      },
+      async requestPasswordReset(email) {
+        const {error} = await requireClient().auth.resetPasswordForEmail(email, {
+          redirectTo: passwordRecoveryRedirectUrl
+        });
+        throwIfError(error);
       },
       async signOut() {
         const {error} = await requireClient().auth.signOut();

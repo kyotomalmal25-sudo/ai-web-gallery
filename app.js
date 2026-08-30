@@ -518,6 +518,31 @@ document.querySelectorAll('.admin-tab').forEach((tab) => tab.onclick = () => { i
 $('#edit-cancel').onclick = () => { resetWorkForm(); openAdminTab('manage'); };
 $('#public-downloads-open').onclick = () => showAdminView('public');
 $('#public-login-back').onclick = () => showAdminView('login');
+$('#password-reset-open').onclick = async () => {
+  const emailInput = $('#admin-login-form').elements.email;
+  const email = emailInput.value.trim();
+  const errorMessage = $('#login-error');
+  if (!email) {
+    errorMessage.textContent = 'メールアドレスを入力してください。';
+    errorMessage.hidden = false;
+    emailInput.focus();
+    return;
+  }
+  try {
+    $('#password-reset-open').disabled = true;
+    await window.aiWorksBackend.auth.requestPasswordReset(email);
+    errorMessage.textContent = '再設定メールを送信しました。受信箱のリンクを開いてください。';
+    errorMessage.hidden = false;
+  } catch (error) {
+    console.error('Password reset request failed.', error);
+    errorMessage.textContent = error?.message === 'SUPABASE_NOT_CONFIGURED'
+      ? 'Supabaseの接続情報がまだ設定されていません。'
+      : '再設定メールを送信できませんでした。管理者メールアドレスを確認してください。';
+    errorMessage.hidden = false;
+  } finally {
+    $('#password-reset-open').disabled = false;
+  }
+};
 $('#admin-login-form').onsubmit = async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
