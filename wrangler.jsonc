@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developers.cloudflare.com/workers/wrangler/config-schema.json",
+  "name": "banana-needs-no-reason",
+  "compatibility_date": "2026-08-30",
+  "assets": {
+    "directory": "."
+  }
+}
