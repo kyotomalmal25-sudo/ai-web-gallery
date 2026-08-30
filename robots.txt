@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://banana-needs-no-reason.kyotomalmal25.workers.dev/sitemap.xml
