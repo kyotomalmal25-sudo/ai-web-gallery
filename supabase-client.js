@@ -39,6 +39,33 @@
     return publicUrl(path);
   }
 
+  async function uploadTextFile(path, content, contentType) {
+    const file = new Blob([String(content ?? '')], {type: `${contentType}; charset=utf-8`});
+    return uploadFile(path, file, `${contentType}; charset=utf-8`);
+  }
+
+  async function uploadPortableFiles(id, record, htmlUrl, thumbnailUrl, uploadedPaths) {
+    const base = `https://banana-needs-no-reason.kyotomalmal25.workers.dev/work/${encodeURIComponent(id)}/`;
+    const files = {
+      html: {name: 'index.html', media_type: 'text/html', url: htmlUrl},
+      thumbnail: {name: 'thumbnail.png', media_type: 'image/png', url: thumbnailUrl},
+      prompt: {name: 'prompt.txt', media_type: 'text/plain', url: `${base}prompt.txt`},
+      memo: {name: 'memo.txt', media_type: 'text/plain', url: `${base}memo.txt`}
+    };
+    const metadata = {schema_version: 'ai-works/1.0', id, title: record.title, ai: record.ai, model: record.model, date: record.date, type: record.type || 'WEB WORK', prompt: record.prompt || '', memo: record.memo || '', html_url: htmlUrl, thumbnail_url: thumbnailUrl, prompt_url: files.prompt.url, memo_url: files.memo.url, files};
+    const sidecars = [
+      ['prompt.txt', record.prompt || '', 'text/plain'],
+      ['memo.txt', record.memo || '', 'text/plain'],
+      ['metadata.json', JSON.stringify(metadata, null, 2), 'application/json']
+    ];
+    for (const [name, content, contentType] of sidecars) {
+      const path = `${id}/${name}`;
+      await uploadTextFile(path, content, contentType);
+      uploadedPaths.push(path);
+    }
+    return {metadata, paths: sidecars.map(([name]) => `${id}/${name}`)};
+  }
+
   function rowFromRecord(record) {
     return {
       id: record.id,
@@ -65,7 +92,7 @@
     requireClient();
     if (!htmlFile) throw new Error('HTML_REQUIRED');
     const id = record.id || crypto.randomUUID();
-    const htmlPath = `${id}/index.${extensionOf(htmlFile, 'html')}`;
+    const htmlPath = `${id}/index.html`;
     const uploadedPaths = [];
     try {
       const htmlUrl = await uploadFile(htmlPath, htmlFile, 'text/html; charset=utf-8');
@@ -73,10 +100,11 @@
       let thumbnailPath = null;
       let thumbnailUrl = '';
       if (thumbnailFile) {
-        thumbnailPath = `${id}/thumbnail.${extensionOf(thumbnailFile, 'png')}`;
+        thumbnailPath = `${id}/thumbnail.png`;
         thumbnailUrl = await uploadFile(thumbnailPath, thumbnailFile);
         uploadedPaths.push(thumbnailPath);
       }
+      await uploadPortableFiles(id, record, htmlUrl, thumbnailUrl, uploadedPaths);
       const complete = {
         ...record,
         id,
@@ -107,18 +135,19 @@
     const uploadedPaths = [];
     try {
       if (htmlFile) {
-        const path = `${id}/index-${Date.now()}.${extensionOf(htmlFile, 'html')}`;
+        const path = `${id}/index.html`;
         nextFiles.html = {name:htmlFile.name, media_type:'text/html', url:await uploadFile(path, htmlFile, 'text/html; charset=utf-8'), path};
         uploadedPaths.push(path);
         if (existing.files.html.path && existing.files.html.path !== path) oldPaths.push(existing.files.html.path);
       }
       if (thumbnailFile) {
-        const path = `${id}/thumbnail-${Date.now()}.${extensionOf(thumbnailFile, 'png')}`;
+        const path = `${id}/thumbnail.png`;
         nextFiles.thumbnail = {name:thumbnailFile.name, media_type:thumbnailFile.type || 'image/png', url:await uploadFile(path, thumbnailFile), path};
         uploadedPaths.push(path);
         if (existing.files.thumbnail.path && existing.files.thumbnail.path !== path) oldPaths.push(existing.files.thumbnail.path);
       }
       const complete = {...record, id, files: nextFiles};
+      await uploadPortableFiles(id, complete, nextFiles.html.url, nextFiles.thumbnail.url, uploadedPaths);
       const updateRow = rowFromRecord(complete);
       delete updateRow.id;
       const {data, error} = await requireClient().from(table).update(updateRow).eq('id', id).select().single();
@@ -137,7 +166,7 @@
   async function removeWork(work) {
     const {error} = await requireClient().from(table).delete().eq('id', work.id);
     throwIfError(error);
-    const paths = [work.files?.html?.path, work.files?.thumbnail?.path].filter(Boolean);
+    const paths = [work.files?.html?.path, work.files?.thumbnail?.path, `${work.id}/metadata.json`, `${work.id}/prompt.txt`, `${work.id}/memo.txt`].filter(Boolean);
     if (paths.length) {
       const {error: storageError} = await requireClient().storage.from(bucket).remove(paths);
       if (storageError) {

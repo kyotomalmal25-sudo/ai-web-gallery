@@ -1,0 +1,14 @@
+{
+  "schema_version": "ai-works/1.0",
+  "id": "grok5",
+  "title": "AQUA / GROK 5",
+  "ai": "Grok",
+  "model": "Grok 5",
+  "date": "2026.08.28",
+  "prompt": "3D シュリンプアクアリウム",
+  "memo": "",
+  "html_url": "https://banana-needs-no-reason.kyotomalmal25.workers.dev/works/grok5.html",
+  "thumbnail_url": "https://banana-needs-no-reason.kyotomalmal25.workers.dev/work/grok5/thumbnail.png",
+  "prompt_url": "https://banana-needs-no-reason.kyotomalmal25.workers.dev/work/grok5/prompt.txt",
+  "memo_url": "https://banana-needs-no-reason.kyotomalmal25.workers.dev/work/grok5/memo.txt"
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "ai-works/1.0",
+  "id": "shrimp-garden",
+  "title": "SHRIMP GARDEN",
+  "ai": "GPT",
+  "model": "GPT-5.6 Sol",
+  "date": "2026.08.26",
+  "prompt": "淡水エビの小宇宙",
+  "memo": "",
+  "html_url": "https://banana-needs-no-reason.kyotomalmal25.workers.dev/works/shrimp-aquarium1.html",
+  "thumbnail_url": "https://banana-needs-no-reason.kyotomalmal25.workers.dev/work/shrimp-garden/thumbnail.png",
+  "prompt_url": "https://banana-needs-no-reason.kyotomalmal25.workers.dev/work/shrimp-garden/prompt.txt",
+  "memo_url": "https://banana-needs-no-reason.kyotomalmal25.workers.dev/work/shrimp-garden/memo.txt"
+}
