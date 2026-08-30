@@ -1,8 +1,11 @@
 {
   "$schema": "https://developers.cloudflare.com/workers/wrangler/config-schema.json",
   "name": "banana-needs-no-reason",
+  "main": "work-worker.js",
   "compatibility_date": "2026-08-30",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/work/*"]
   }
 }

@@ -20,6 +20,19 @@ AIが生成したWeb作品を保存・比較するための静的ギャラリー
 
 各ページはJavaScriptなしでも作品情報を読め、`metadata.json`、`prompt.txt`、`memo.txt`、サムネイル、元HTMLへ直接アクセスできます。管理者がAdmin Uploadで作品を追加・更新する場合も、Supabase Storageへ`work-id/index.html`、`thumbnail.png`、`metadata.json`、`prompt.txt`、`memo.txt`を保存します。
 
+## Dynamic `/work/<id>/` pages
+
+`work-worker.js` is the Cloudflare Worker entrypoint. It reads public rows from `public.works` and renders `/work/<uuid>/` without a redeploy after each upload. Existing non-UUID fixed pages such as `/work/shrimp-garden/` and `/work/grok5/` fall back to the static assets.
+
+Configure the Worker with the Supabase project URL and the same public anon key used by the browser client:
+
+```text
+wrangler secret put SUPABASE_URL
+wrangler secret put SUPABASE_ANON_KEY
+```
+
+The browser upload flow first inserts a row without an ID, receives the database-generated UUID, then uses that UUID for every Storage path and the public work URL. If a later upload/update fails, the temporary row and uploaded objects are cleaned up.
+
 ## 公開用設定
 
 ブラウザに公開してよい Supabase Project URL と Publishable/Anon key のみを `supabase-config.js` に置きます。

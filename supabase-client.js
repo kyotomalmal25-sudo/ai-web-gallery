@@ -91,10 +91,16 @@
   async function createWork(record, htmlFile, thumbnailFile) {
     requireClient();
     if (!htmlFile) throw new Error('HTML_REQUIRED');
-    const id = record.id || crypto.randomUUID();
-    const htmlPath = `${id}/index.html`;
+    let id = null;
+    const htmlPathFor = (value) => `${value}/index.html`;
     const uploadedPaths = [];
     try {
+      const pending = rowFromRecord({...record, id: undefined, files: {html: {url: ''}, thumbnail: {url: ''}}});
+      delete pending.id;
+      const {data: inserted, error: insertError} = await requireClient().from(table).insert(pending).select().single();
+      throwIfError(insertError);
+      id = inserted.id;
+      const htmlPath = htmlPathFor(id);
       const htmlUrl = await uploadFile(htmlPath, htmlFile, 'text/html; charset=utf-8');
       uploadedPaths.push(htmlPath);
       let thumbnailPath = null;
@@ -115,11 +121,12 @@
             : {name:'', media_type:'image/png', url:'', path:null}
         }
       };
-      const {data, error} = await requireClient().from(table).insert(rowFromRecord(complete)).select().single();
+      const {data, error} = await requireClient().from(table).update(rowFromRecord(complete)).eq('id', id).select().single();
       throwIfError(error);
       return data;
     } catch (error) {
       if (uploadedPaths.length) await requireClient().storage.from(bucket).remove(uploadedPaths);
+      if (id) await requireClient().from(table).delete().eq('id', id);
       throw error;
     }
   }

@@ -1,5 +1,7 @@
 .git/
 .wrangler/
+work-worker.js
+wrangler.jsonc
 .env
 .env.*
 !.env.example

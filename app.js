@@ -584,9 +584,8 @@ $('#upload-form').onsubmit = async (event) => {
   const thumbnailFile = form.elements.thumbnail.files[0];
   try {
     if (!existing && !htmlFile) throw new Error('HTML_REQUIRED');
-    const id = existing?.id || crypto.randomUUID();
     const record = {
-      id,
+      ...(existing ? {id: existing.id} : {}),
       title: String(data.get('title')).trim(),
       ai: data.get('ai'),
       model: String(data.get('model')).trim(),
