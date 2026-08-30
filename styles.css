@@ -76,13 +76,13 @@ button { cursor: pointer; }
 .text-link b, .favorite-open b { color: var(--primary); margin-left: 5px; }
 .category-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
 .category-card { position: relative; min-height: 104px; border: 1px solid var(--line); border-radius: 13px; background: rgba(255, 255, 255, .72); padding: 14px 16px; text-align: left; color: var(--ink); transition: transform .2s, border-color .2s, background .2s; overflow: hidden; }
-.category-card:after { content: ''; position: absolute; right: -8px; bottom: 16px; width: 56px; height: 1px; background: var(--selected); transform: rotate(-38deg); transform-origin: right center; opacity: .72; }
+.category-card:after { content: ''; position: absolute; right: -10px; bottom: 17px; width: 72px; height: 1px; background: var(--selected); transform: rotate(-38deg); transform-origin: right center; opacity: .88; }
 .category-card:hover { transform: translateY(-3px); border-color: var(--secondary); background: #fff; }
 .category-card .category-symbol { display: grid; place-items: center; width: 28px; height: 28px; margin-bottom: 17px; border: 1px solid var(--line); border-radius: 50%; color: var(--primary); font: 600 10px 'DM Mono'; }
 .category-card .category-icon { display: block; width: 42px; height: 42px; object-fit: contain; }
 .category-card[data-category="Qwen"] .category-icon { width: 40px; height: 40px; }
 .category-card strong { position: absolute; left: 16px; bottom: 13px; display: block; font: 700 15px Manrope; letter-spacing: -.02em; }
-.category-count { position: absolute; right: 14px; top: 12px; color: var(--primary); font: 500 17px 'DM Mono'; }
+.category-count { position: absolute; right: 14px; top: 13px; color: var(--primary); font: 500 14px 'DM Mono'; }
 .recent-gallery { margin-bottom: 2px; }
 .favorite-summary { display: flex; align-items: center; justify-content: space-between; min-height: 132px; padding: 25px 28px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(105deg, rgba(184, 226, 230, .25), rgba(255, 255, 255, .75)); }
 .favorite-summary > div { display: flex; align-items: center; gap: 18px; }
