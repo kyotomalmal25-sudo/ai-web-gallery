@@ -284,7 +284,7 @@ function renderCategoryCards() {
   $('#category-grid').innerHTML = categories.map((category) => {
     const count = works.filter((work) => work.ai === categoryValue(category.key)).length;
     const icon = category.icon ? `<img class="category-icon" src="${category.icon}" alt="" />` : `<span class="category-symbol">${category.symbol}</span>`;
-    return `<button class="category-card" data-category="${category.key}">${icon}<strong>${category.label}</strong><small>WEB WORKS</small><span class="category-count">${String(count).padStart(2, '0')}</span></button>`;
+    return `<button class="category-card" data-category="${category.key}">${icon}<strong>${category.label}</strong><span class="category-count">${String(count).padStart(2, '0')}</span></button>`;
   }).join('');
   document.querySelectorAll('[data-category]').forEach((button) => button.onclick = () => openCategory(button.dataset.category));
 }
