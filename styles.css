@@ -82,7 +82,7 @@ button { cursor: pointer; }
 .category-card .category-icon { position: absolute; left: 16px; top: 50%; display: block; width: 52px; height: 52px; object-fit: contain; transform: translateY(-50%); }
 .category-card[data-category="Qwen"] .category-icon { width: 50px; height: 50px; }
 .category-card strong { position: absolute; left: 84px; top: 50%; display: block; font: 700 18px Manrope; letter-spacing: -.035em; transform: translateY(-50%); }
-.category-count { position: absolute; right: 14px; bottom: 12px; color: #7C8F95; font: 400 14px 'DM Mono'; letter-spacing: .03em; }
+.category-count { position: absolute; right: 14px; bottom: 12px; color: #7C8F95; font: 400 11px 'DM Mono'; letter-spacing: .03em; }
 .recent-gallery { margin-bottom: 2px; }
 .favorite-summary { display: flex; align-items: center; justify-content: space-between; min-height: 132px; padding: 25px 28px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(105deg, rgba(184, 226, 230, .25), rgba(255, 255, 255, .75)); }
 .favorite-summary > div { display: flex; align-items: center; gap: 18px; }
