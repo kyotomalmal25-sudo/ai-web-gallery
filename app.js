@@ -232,7 +232,7 @@ function card(work, index) {
       ? `<button class="open-link open-html" data-open-html="${escapeHtml(work.id)}">作品を開く ↗</button>`
       : '<span class="open-link">プレビュー準備中</span>';
   return `<article class="card">
-    <div class="thumb">${art}<div class="thumb-top"><span>NO. ${String(index + 1).padStart(2, '0')}</span><span>${escapeHtml(work.date)}</span></div><div class="thumb-bottom"><strong>${escapeHtml(work.ai).toUpperCase()}</strong></div></div>
+    <div class="thumb">${art}<div class="thumb-bottom"><strong>${escapeHtml(work.ai).toUpperCase()}</strong></div></div>
     <div class="card-body"><div class="card-title-line"><h3>${escapeHtml(work.title)}</h3><span class="model-name">${escapeHtml(work.model)}</span></div><div class="card-meta"><span>${escapeHtml(work.date)}</span><span>${escapeHtml(work.type)}</span></div><p class="card-prompt">${escapeHtml(work.prompt)}</p><div class="card-footer"><div class="card-actions">${openAction}<a class="info-link" href="${escapeHtml(infoUrl)}" target="_blank" rel="noopener">AI向け情報 ↗</a></div><button class="favorite ${favorite ? 'is-favorite' : ''}" data-favorite="${escapeHtml(work.id)}" aria-label="お気に入り">${favorite ? '♥' : '♡'}</button></div></div>
   </article>`;
 }
