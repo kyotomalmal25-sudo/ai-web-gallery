@@ -2,6 +2,7 @@
 const defaultWorks = [
   {id:'83e7b1fa-6c14-450b-afa9-500854317af5',title:'シュリンプアクアリウム',model:'Grok4.5',ai:'Grok',date:'2026.08.30',prompt:'3D シュリンプアクアリウム',memo:'アクアリウムシミュレーター（エビ）AI比較企画。5回修正',kind:'WEB WORK',art:'art-a',sample:false,href:'https://pgybuocqlhltepfnubfr.supabase.co/storage/v1/object/public/ai-works/83e7b1fa-6c14-450b-afa9-500854317af5/index.html'},
   {id:'8bc53c94-1a7d-4793-98ef-eb3f5cca87de',title:'シュリンプガーデン',model:'5.6 sol',ai:'GPT',date:'2026.08.30',prompt:'淡水エビの小宇宙',memo:'',kind:'WEB WORK',art:'art-b',sample:false,href:'https://pgybuocqlhltepfnubfr.supabase.co/storage/v1/object/public/ai-works/8bc53c94-1a7d-4793-98ef-eb3f5cca87de/index.html'},
+  {id:'ai-physics-toy',title:'AIアイコン風の物理おもちゃ',model:'GPT-5.6',ai:'GPT',date:'2026.09.03',prompt:'Google Labsのポップな単色図形を参考に、5つのAIアイコン風オブジェクトを物理演算で動かす。',memo:'ドラッグ、投擲、衝突、壁・床のバウンド、レスポンシブ対応。',kind:'WEB WORK',art:'art-a',sample:false,infoUrl:'work/ai-physics-toy/',href:'works/ai-physics-toy.html'},
   
 ];
 
@@ -89,7 +90,7 @@ function normalizeWork(source) {
     memo: String(raw.memo || ''),
     other: raw.other || raw.other_category,
     art: raw.art || 'art-a',
-    infoUrl: `work/${encodeURIComponent(id)}/`,
+    infoUrl: raw.infoUrl || `work/${encodeURIComponent(id)}/`,
     sample: raw.sample ?? false,
     files: {
       html: {
@@ -139,7 +140,8 @@ const workRepository = {
   async load() {
     if (!window.aiWorksBackend?.configured) return clone(defaultWorks).map(normalizeWork);
     const records = await window.aiWorksBackend.listWorks();
-    return records.map(normalizeWork);
+    const bundled = defaultWorks.filter((work) => work.id === 'ai-physics-toy');
+    return [...bundled, ...records].map(normalizeWork);
   },
   async create(record, htmlFile, thumbnailFile) {
     if (!authRepository.isAuthenticated()) throw new Error('AUTH_REQUIRED');

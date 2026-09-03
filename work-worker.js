@@ -19,6 +19,9 @@ const LEGACY_WORK_ROUTES = new Map([
   ['grok5', (work) => work[FIELD_MAP.ai] === 'Grok'],
   ['shrimp-garden', (work) => work[FIELD_MAP.ai] === 'GPT' && /shrimp|シュリンプ|garden/i.test(String(work[FIELD_MAP.title] || ''))],
 ]);
+const STATIC_WORK_ROUTES = new Map([
+  ['ai-physics-toy', '/works/ai-physics-toy.html'],
+]);
 const BUCKET = 'ai-works';
 const SIDECAR_TYPES = {
   'metadata.json': 'application/json; charset=utf-8',
@@ -162,6 +165,11 @@ async function handleWork(request, env, url) {
   if (parts.length < 2 || parts[0] !== 'work') return null;
   const id = decodeURIComponent(parts[1]);
   const fileName = parts[2] || '';
+
+  if (STATIC_WORK_ROUTES.has(id)) {
+    if (fileName) return response('Not Found', 404, {'content-type': 'text/plain; charset=utf-8'});
+    return env.ASSETS.fetch(new Request(new URL(STATIC_WORK_ROUTES.get(id), url.origin), request));
+  }
 
   const legacyRedirect = await redirectLegacyWork(request, env, id, fileName);
   if (legacyRedirect) return legacyRedirect;

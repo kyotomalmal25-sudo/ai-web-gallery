@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="GPT、Claude、Gemini、Grok、Qwenを連想する5つの抽象オブジェクトを転がしてぶつける物理おもちゃ。">
+  <title>AIアイコン風の物理おもちゃ</title>
+  <style>
+    :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;color:#20242a;background:#f8f7f4}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:clamp(14px,3vw,34px);background:radial-gradient(circle at 15% 0%,#fff 0 22%,transparent 52%),#f8f7f4}
+    main{width:min(1100px,100%);margin:auto}.top{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:0 0 18px}.eyebrow{font-size:12px;letter-spacing:.16em;font-weight:800;color:#747a81}.top h1{font-size:clamp(25px,4vw,42px);line-height:1.05;margin:8px 0 0;letter-spacing:-.04em}.top p{margin:0;color:#73777c;font-size:14px;text-align:right}.stage-wrap{padding:10px;border-radius:28px;background:#fff;border:1px solid #e9e7e1;box-shadow:0 18px 50px #43434312}.stage{position:relative;overflow:hidden;border-radius:20px;background:#f0eee8;aspect-ratio:16/10;min-height:390px}.stage:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff32 1px,transparent 1px),linear-gradient(90deg,#ffffff32 1px,transparent 1px);background-size:42px 42px;pointer-events:none}.stage canvas{display:block;width:100%;height:100%;touch-action:none}.hud{position:absolute;z-index:2;left:18px;top:16px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:none}.pill{padding:7px 10px;border-radius:999px;background:#ffffffb8;border:1px solid #fff;font-size:12px;font-weight:800;backdrop-filter:blur(8px)}.legend{display:flex;gap:9px;flex-wrap:wrap;margin:15px 2px 0}.legend span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#595e65}.dot{width:10px;height:10px;border-radius:50%;display:inline-block}.controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 2px 0;color:#777;font-size:13px}.controls button{border:1px solid #ddd9d0;border-radius:999px;background:#fff;padding:9px 14px;font:inherit;font-weight:800;color:#30343a;cursor:pointer}.controls button:hover{background:#f0eee8}@media(max-width:620px){.top{display:block}.top p{text-align:left;margin-top:10px}.stage{aspect-ratio:4/5;min-height:500px}.controls{align-items:flex-start}.controls span{max-width:70%}}
+  </style>
+</head>
+<body>
+  <main>
+    <header class="top"><div><div class="eyebrow">AI WORKS / PLAYGROUND 03</div><h1>ころがる、ぶつかる。</h1></div><p>5つの抽象オブジェクトを<br>つかんで投げてみよう</p></header>
+    <section class="stage-wrap" aria-label="AIアイコン風の物理おもちゃ">
+      <div class="stage"><div class="hud"><span class="pill">DRAG &amp; THROW</span><span class="pill" id="status">5 OBJECTS</span></div><canvas id="canvas" aria-label="5つのオブジェクトが動くキャンバス"></canvas></div>
+      <div class="legend" aria-label="オブジェクト一覧"><span><i class="dot" style="background:#35c7d4"></i>GPT / loop</span><span><i class="dot" style="background:#f28c68"></i>Claude / soft</span><span><i class="dot" style="background:#4d7cff"></i>Gemini / star</span><span><i class="dot" style="background:#f1bd3a"></i>Grok / cross</span><span><i class="dot" style="background:#d66be8"></i>Qwen / arc</span></div>
+      <div class="controls"><span>床・壁で跳ね返り、オブジェクト同士も押し合います。</span><button id="reset" type="button">もう一度散らす ↗</button></div>
+    </section>
+  </main>
+  <script>
+  (()=>{const canvas=document.querySelector('#canvas'),ctx=canvas.getContext('2d'),status=document.querySelector('#status');let W=0,H=0,dpr=1,drag=null,last=0;
+    const specs=[
+      {name:'GPT',color:'#35c7d4',r:42,mass:1.05,bounce:.7,friction:.992,shape:'loop',x:.22,y:.27,vx:1.8,vy:.2},
+      {name:'Claude',color:'#f28c68',r:48,mass:1.35,bounce:.48,friction:.985,shape:'soft',x:.49,y:.24,vx:-.8,vy:.3},
+      {name:'Gemini',color:'#4d7cff',r:43,mass:.9,bounce:.82,friction:.995,shape:'star',x:.74,y:.3,vx:-1.5,vy:.4},
+      {name:'Grok',color:'#f1bd3a',r:40,mass:.78,bounce:.9,friction:.994,shape:'cross',x:.35,y:.55,vx:1.2,vy:-.3},
+      {name:'Qwen',color:'#d66be8',r:45,mass:1.15,bounce:.62,friction:.99,shape:'arc',x:.66,y:.58,vx:-1.1,vy:-.2}
+    ];let bodies=[];
+    function resize(){const box=canvas.getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);W=box.width;H=box.height;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);if(!bodies.length)reset()}
+    function reset(){bodies=specs.map(s=>({...s,x:s.x*W,y:s.y*H,vx:s.vx*55,vy:s.vy*55,angle:0,spin:(Math.random()-.5)*.02}));status.textContent='5 OBJECTS'}
+    function polygon(points){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath()}
+    function draw(b){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.angle);ctx.shadowColor=b.color+'55';ctx.shadowBlur=18;ctx.shadowOffsetY=8;ctx.fillStyle=b.color;ctx.strokeStyle='#ffffffc8';ctx.lineWidth=3;
+      if(b.shape==='soft'){ctx.beginPath();ctx.ellipse(0,0,b.r*1.02,b.r*.83,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.arc(-10,-8,7,0,Math.PI*2);ctx.fillStyle='#ffffff66';ctx.fill()}
+      if(b.shape==='star'){const p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?b.r*.43:b.r;p.push([Math.cos(a)*r,Math.sin(a)*r])}polygon(p);ctx.fill();ctx.stroke()}
+      if(b.shape==='cross'){ctx.beginPath();ctx.moveTo(-b.r*.18,-b.r);ctx.lineTo(b.r*.18,-b.r*.18);ctx.lineTo(b.r,-b.r*.18);ctx.lineTo(b.r,b.r*.18);ctx.lineTo(b.r*.18,b.r*.18);ctx.lineTo(b.r*.18,b.r);ctx.lineTo(-b.r*.18,b.r);ctx.lineTo(-b.r*.18,b.r*.18);ctx.lineTo(-b.r,b.r*.18);ctx.lineTo(-b.r,-b.r*.18);ctx.lineTo(-b.r*.18,-b.r*.18);ctx.closePath();ctx.fill();ctx.stroke()}
+      if(b.shape==='loop'){ctx.beginPath();ctx.arc(-12,0,b.r*.58,0,Math.PI*2);ctx.arc(12,0,b.r*.58,0,Math.PI*2);ctx.fill('evenodd');ctx.stroke();}
+      if(b.shape==='arc'){ctx.beginPath();ctx.arc(0,0,b.r*.68,-.9,4.4);ctx.lineWidth=15;ctx.lineCap='round';ctx.strokeStyle=b.color;ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='#ffffffc8';ctx.beginPath();ctx.arc(0,0,b.r*.68,-.9,4.4);ctx.stroke()}
+      ctx.shadowColor='transparent';ctx.fillStyle='#24262b';ctx.font='800 11px ui-rounded,system-ui';ctx.textAlign='center';ctx.fillText(b.name,0,b.r+18);ctx.restore()}
+    function collide(a,b){const dx=b.x-a.x,dy=b.y-a.y,dist=Math.hypot(dx,dy),min=a.r+b.r;if(!dist||dist>=min)return;const nx=dx/dist,ny=dy/dist,overlap=min-dist;a.x-=nx*overlap*.5;a.y-=ny*overlap*.5;b.x+=nx*overlap*.5;b.y+=ny*overlap*.5;const rvx=b.vx-a.vx,rvy=b.vy-a.vy,rel=rvx*nx+rvy*ny;if(rel>0)return;const e=Math.min(a.bounce,b.bounce),imp=-(1+e)*rel/(1/a.mass+1/b.mass);a.vx-=imp*nx/a.mass;a.vy-=imp*ny/a.mass;b.vx+=imp*nx/b.mass;b.vy+=imp*ny/b.mass}
+    function frame(t){const dt=Math.min((t-last||16)/1000,.032);last=t;for(const b of bodies){if(b!==drag?.body){b.vy+=480*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;b.angle+=b.spin*b.vx*dt;b.vx*=Math.pow(b.friction,dt*60);if(b.x-b.r<0){b.x=b.r;b.vx=Math.abs(b.vx)*b.bounce}if(b.x+b.r>W){b.x=W-b.r;b.vx=-Math.abs(b.vx)*b.bounce}if(b.y-b.r<0){b.y=b.r;b.vy=Math.abs(b.vy)*b.bounce}if(b.y+b.r>H){b.y=H-b.r;b.vy=-Math.abs(b.vy)*b.bounce;b.vx*=.98}}}for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++)collide(bodies[i],bodies[j]);ctx.clearRect(0,0,W,H);bodies.forEach(draw);requestAnimationFrame(frame)}
+    function point(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+    canvas.addEventListener('pointerdown',e=>{const p=point(e);const body=bodies.slice().reverse().find(b=>Math.hypot(p.x-b.x,p.y-b.y)<b.r*1.15);if(!body)return;canvas.setPointerCapture(e.pointerId);drag={body,x:p.x,y:p.y,px:p.x,py:p.y,vx:0,vy:0};status.textContent=body.name+' IN HAND'})
+    canvas.addEventListener('pointermove',e=>{if(!drag)return;const p=point(e);drag.body.x=p.x;drag.body.y=p.y;drag.vx=(p.x-drag.px)*60;drag.vy=(p.y-drag.py)*60;drag.px=p.x;drag.py=p.y})
+    canvas.addEventListener('pointerup',()=>{if(!drag)return;drag.body.vx=drag.vx;drag.body.vy=drag.vy;drag=null;status.textContent='5 OBJECTS'})
+    addEventListener('resize',resize);document.querySelector('#reset').onclick=reset;resize();requestAnimationFrame(frame);
+  })();
+  </script>
+</body>
+</html>
