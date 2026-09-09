@@ -130,6 +130,8 @@ button { cursor: pointer; }
 .card-body { padding: 16px 17px 17px; }
 .card-title-line { display: flex; justify-content: space-between; gap: 10px; }
 .card h3 { margin: 0; font: 600 16px Manrope; letter-spacing: -.045em; }
+.model-meta { display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; min-width: 0; }
+.ai-name { color: var(--ink); font: 700 10px 'DM Mono'; letter-spacing: .04em; white-space: nowrap; }
 .model-name { color: var(--primary); font: 10px 'DM Mono'; padding-top: 3px; text-align: right; white-space: nowrap; }
 .card-meta { display: flex; gap: 10px; margin-top: 12px; color: var(--muted); font: 9px 'DM Mono'; letter-spacing: .04em; }
 .card-meta span + span { border-left: 1px solid var(--line); padding-left: 10px; }

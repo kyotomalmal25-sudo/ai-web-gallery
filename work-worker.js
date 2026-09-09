@@ -19,9 +19,7 @@ const LEGACY_WORK_ROUTES = new Map([
   ['grok5', (work) => work[FIELD_MAP.ai] === 'Grok'],
   ['shrimp-garden', (work) => work[FIELD_MAP.ai] === 'GPT' && /shrimp|シュリンプ|garden/i.test(String(work[FIELD_MAP.title] || ''))],
 ]);
-const STATIC_WORK_ROUTES = new Map([
-  ['ai-physics-toy', '/works/ai-physics-toy.html'],
-]);
+const STATIC_WORK_ROUTES = new Map();
 const BUCKET = 'ai-works';
 const SIDECAR_TYPES = {
   'metadata.json': 'application/json; charset=utf-8',
