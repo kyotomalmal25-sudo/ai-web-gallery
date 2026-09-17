@@ -62,12 +62,8 @@ button { cursor: pointer; }
 .mobile-menu { display: none; }
 
 .home-dashboard { max-width: 1180px; margin: 0 auto; }
-.slime-top-exhibit { background:#02070b; border:1px solid #233f48; color:#dffaff; height:min(62vw,520px); min-height:360px; margin:0 0 36px; overflow:hidden; position:relative; }
+.slime-top-exhibit { background:transparent; height:min(62vw,520px); min-height:360px; margin:0 0 36px; overflow:hidden; position:relative; }
 .slime-top-exhibit iframe { border:0; height:100%; inset:0; position:absolute; width:100%; }
-.slime-top-heading { display:grid; gap:7px; left:28px; pointer-events:none; position:absolute; top:24px; z-index:2; }
-.slime-top-heading span,.slime-top-heading small { color:#81a7b0; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.08em; }
-.slime-top-heading strong { color:#b9f7ff; font-size:21px; font-weight:600; letter-spacing:.06em; }
-.slime-top-heading small { margin-top:5px; }
 .home-brand { min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 82px 0 72px; border-bottom: 1px solid var(--line); }
 .home-brand-lockup { position: relative; width: min(440px, 76vw); }
 .home-brand-icon { display: block; width: 100%; height: auto; object-fit: contain; opacity: 1; }
@@ -277,8 +273,6 @@ html[data-theme="dark"] .home-brand-icon-text { display: block; clip-path: inset
   .mobile-menu { display: block; border: 0; background: transparent; color: var(--muted); font-size: 20px; }
   .topbar { height: 64px; }
   .slime-top-exhibit { height:420px; min-height:320px; margin-bottom:24px; }
-  .slime-top-heading { left:18px; top:18px; }
-  .slime-top-heading strong { font-size:18px; }
   .home-brand { min-height: 330px; padding: 36px 0; }
   .home-brand-lockup { width: min(320px, 86vw); }
   .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
