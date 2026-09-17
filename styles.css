@@ -62,7 +62,7 @@ button { cursor: pointer; }
 .mobile-menu { display: none; }
 
 .home-dashboard { max-width: 1180px; margin: 0 auto; }
-.slime-top-exhibit { background:transparent; height:min(62vw,520px); min-height:360px; margin:0 0 36px; overflow:hidden; position:relative; }
+.slime-top-exhibit { background:var(--bg); height:min(62vw,520px); min-height:360px; margin:0 0 36px; overflow:hidden; position:relative; }
 .slime-top-exhibit iframe { border:0; height:100%; inset:0; position:absolute; width:100%; }
 .home-brand { min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 82px 0 72px; border-bottom: 1px solid var(--line); }
 .home-brand-lockup { position: relative; width: min(440px, 76vw); }
