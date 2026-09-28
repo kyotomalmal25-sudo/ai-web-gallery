@@ -508,7 +508,15 @@ $('#admin-open').onclick = () => {
 };
 $('#admin-close').onclick = () => { if (recoveryMode) return; modal.hidden = true; resetWorkForm(); };
 modal.onclick = (event) => { if (!recoveryMode && event.target === modal) { modal.hidden = true; resetWorkForm(); } };
-$('#mobile-menu').onclick = () => $('.sidebar').classList.toggle('open');
+const sidebar = $('.sidebar');
+const sidebarToggle = $('#sidebar-toggle');
+sidebarToggle.onclick = () => {
+  const collapsed = $('.app-shell').classList.toggle('sidebar-collapsed');
+  sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+  sidebarToggle.setAttribute('aria-label', collapsed ? 'サイドバーを開く' : 'サイドバーを閉じる');
+  sidebarToggle.querySelector('.material-symbols-outlined').textContent = collapsed ? 'left_panel_open' : 'left_panel_close';
+};
+$('#mobile-menu').onclick = () => sidebar.classList.toggle('open');
 document.querySelectorAll('.admin-tab').forEach((tab) => tab.onclick = () => { if (tab.dataset.tab === 'upload' && $('#manage-panel').hidden === false) resetWorkForm(); openAdminTab(tab.dataset.tab); });
 $('#edit-cancel').onclick = () => { resetWorkForm(); openAdminTab('manage'); };
 $('#public-downloads-open').onclick = () => showAdminView('public');
