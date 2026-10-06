@@ -1,0 +1,16 @@
+{
+  "name": "ai-works-gallery",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "check:ai-works": "node scripts/prepare-ai-works.cjs",
+    "deploy:ai-works": "node scripts/deploy-ai-works.cjs",
+    "deploy:ai-works:dry-run": "node scripts/deploy-ai-works.cjs --dry-run"
+  },
+  "devDependencies": {
+    "wrangler": "4.147.0"
+  },
+  "overrides": {
+    "sharp": "0.35.5"
+  }
+}

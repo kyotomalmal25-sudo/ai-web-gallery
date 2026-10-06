@@ -1,5 +1,30 @@
 # AI Works
 
+## Production deployment (AI Works only)
+
+The production Worker `banana-needs-no-reason` is reserved for AI Works at
+https://banana-needs-no-reason.kyotomalmal25.workers.dev/. Its historical name must
+stay unchanged to preserve existing links. Other sites need a separate project
+directory, Worker name, config and deploy script; do not reuse this target.
+
+```sh
+npm ci
+npm run deploy:ai-works:dry-run
+npm run deploy:ai-works
+```
+
+`wrangler.jsonc` pins the AI Works account, entrypoint and dynamic routes.
+The deploy script accepts only `--dry-run`, rejects target/environment overrides,
+checks the GitHub origin and AI Works source markers, and stages only public
+assets in `dist/ai-works`. Existing Worker variables/secrets are preserved.
+The GitHub Pages workflow remains separate; CI checks the AI Works boundaries.
+Do not upload an unrelated site's files through the Cloudflare dashboard to this
+Worker: manual/API deployments bypass repository checks.
+
+After deployment check `/`, a real `/work/<UUID>/`, its `metadata.json`,
+`prompt.txt`, `memo.txt`, thumbnail and original HTML, plus `/work/grok5/` and
+`/work/shrimp-garden/`. Supabase Database/Storage contents need no changes.
+
 AIが生成したWeb作品を保存・比較するための静的ギャラリーです。
 
 ## 構成

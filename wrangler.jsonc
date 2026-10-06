@@ -1,11 +1,17 @@
 {
   "$schema": "https://developers.cloudflare.com/workers/wrangler/config-schema.json",
   "name": "banana-needs-no-reason",
+  "account_id": "88dc9da24144ad2c2056a9ef34e4ce56",
+  "workers_dev": true,
+  "keep_vars": true,
   "main": "work-worker.js",
   "compatibility_date": "2026-08-30",
   "assets": {
-    "directory": ".",
+    "directory": "dist/ai-works",
     "binding": "ASSETS",
     "run_worker_first": ["/", "/work/*"]
+  },
+  "build": {
+    "command": "node scripts/prepare-ai-works.cjs"
   }
 }
