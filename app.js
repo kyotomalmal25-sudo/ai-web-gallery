@@ -14,6 +14,7 @@ const categories = [
   {key:'Other', label:'その他', symbol:'+', icon:'assets/ai-category-other.png'}
 ];
 
+const AI_WORKS_ORIGIN = 'https://banana-needs-no-reason.kyotomalmal25.workers.dev';
 const THEME_STORAGE_KEY = 'ai-works-theme';
 const FAVORITES_STORAGE_KEY = 'ai-works-favorites';
 const PORTABLE_SCHEMA_VERSION = 'ai-works/1.0';
@@ -60,6 +61,11 @@ function mediaTypeFromName(name = '', fallback = 'application/octet-stream') {
   return ({html:'text/html', htm:'text/html', css:'text/css', js:'text/javascript', json:'application/json', txt:'text/plain', png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', webp:'image/webp', gif:'image/gif'})[extension] || fallback;
 }
 
+/* AI向けのURLは必ずhttps（work://やblob:やrelativeはAIが開けない） */
+function publicWorkUrl(id, fileName = '') {
+  return `${AI_WORKS_ORIGIN}/work/${encodeURIComponent(id)}/${fileName ? encodeURIComponent(fileName) : ''}`;
+}
+
 function portableFileUrl(id, fileName) {
   return `work://${encodeURIComponent(id)}/${encodeURIComponent(fileName)}`;
 }
@@ -89,7 +95,7 @@ function normalizeWork(source) {
     memo: String(raw.memo || ''),
     other: raw.other || raw.other_category,
     art: raw.art || 'art-a',
-    infoUrl: raw.infoUrl || `work/${encodeURIComponent(id)}/`,
+    infoUrl: publicWorkUrl(id),
     sample: raw.sample ?? false,
     files: {
       html: {
@@ -110,13 +116,13 @@ function normalizeWork(source) {
       prompt: {
         name: 'prompt.txt',
         media_type: 'text/plain',
-        url: portableFileUrl(id, 'prompt.txt'),
+        url: publicWorkUrl(id, 'prompt.txt'),
         content: String(raw.prompt || '')
       },
       memo: {
         name: 'memo.txt',
         media_type: 'text/plain',
-        url: portableFileUrl(id, 'memo.txt'),
+        url: publicWorkUrl(id, 'memo.txt'),
         content: String(raw.memo || '')
       }
     }
@@ -215,7 +221,6 @@ function filteredWorks() {
   return list;
 }
 
-const AI_WORKS_ORIGIN = 'https://banana-needs-no-reason.kyotomalmal25.workers.dev';
 /* 作品は常にhttpsの通常URLで開く（blob:は他のAIから開けない）。Worker以外のオリジンからでもWorkerのURLを指す */
 function workViewUrl(id) {
   const base = location.hostname.endsWith('.workers.dev') ? '' : AI_WORKS_ORIGIN;
@@ -230,7 +235,7 @@ function card(work, index) {
     ? `<img class="thumb-image" src="${escapeHtml(thumbnailData)}" alt="" />`
     : `<div class="thumb-art ${work.art || 'art-a'}"></div><div class="thumb-grid"></div>`;
   const storageHtml = Boolean(htmlFile.path || /^https?:\/\//.test(htmlFile.url || ''));
-  const infoUrl = work.infoUrl || `work/${encodeURIComponent(work.id)}/`;
+  const infoUrl = publicWorkUrl(work.id);
   const viewUrl = workViewUrl(work.id);
   const openAction = storageHtml
     ? `<a class="open-link" href="${escapeHtml(viewUrl)}" target="_blank" rel="noopener">作品を開く ↗</a>`
@@ -376,6 +381,7 @@ function metadataDocument(work) {
     thumbnail_url: work.files.thumbnail.url,
     prompt_url: work.files.prompt.url,
     memo_url: work.files.memo.url,
+    info_url: publicWorkUrl(work.id),
     files: {
       html: {name:work.files.html.name, media_type:work.files.html.media_type, url:work.files.html.url},
       thumbnail: {name:work.files.thumbnail.name, media_type:work.files.thumbnail.media_type, url:work.files.thumbnail.url},
