@@ -158,6 +158,20 @@ function renderWorkPage(work, id, env) {
   return response(html, 200, {'content-type': 'text/html; charset=utf-8'});
 }
 
+// Supabase Storage serves HTML as text/plain, so re-serve work HTML as a real page over https.
+// CSP sandbox gives the untrusted work an opaque origin: it cannot read the gallery's admin session.
+async function serveWorkHtml(work, id, env, request) {
+  const upstream = await fetch(workFileUrl(work, id, 'index.html', env), {method: request.method === 'HEAD' ? 'HEAD' : 'GET'});
+  if (!upstream.ok) return response('Not Found', upstream.status === 404 ? 404 : 502, {'content-type': 'text/plain; charset=utf-8'});
+  return new Response(request.method === 'HEAD' ? null : upstream.body, {status: 200, headers: {
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'public, max-age=60',
+    'content-security-policy': 'sandbox allow-scripts allow-popups allow-forms allow-modals allow-pointer-lock allow-downloads',
+    'x-content-type-options': 'nosniff',
+    'access-control-allow-origin': '*',
+  }});
+}
+
 async function handleWork(request, env, url) {
   const parts = url.pathname.split('/').filter(Boolean);
   if (parts.length < 2 || parts[0] !== 'work') return null;
@@ -187,6 +201,7 @@ async function handleWork(request, env, url) {
     const key = fileName === 'prompt.txt' ? FIELD_MAP.prompt : FIELD_MAP.memo;
     return response(work[key] || '', 200, {'content-type': SIDECAR_TYPES[fileName]});
   }
+  if (fileName === 'index.html') return serveWorkHtml(work, id, env, request);
   return fetch(workFileUrl(work, id, fileName, env), {method: request.method, headers: request.headers});
 }
 

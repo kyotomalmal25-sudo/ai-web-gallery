@@ -215,6 +215,13 @@ function filteredWorks() {
   return list;
 }
 
+const AI_WORKS_ORIGIN = 'https://banana-needs-no-reason.kyotomalmal25.workers.dev';
+/* 作品は常にhttpsの通常URLで開く（blob:は他のAIから開けない）。Worker以外のオリジンからでもWorkerのURLを指す */
+function workViewUrl(id) {
+  const base = location.hostname.endsWith('.workers.dev') ? '' : AI_WORKS_ORIGIN;
+  return `${base}/work/${encodeURIComponent(id)}/index.html`;
+}
+
 function card(work, index) {
   const favorite = favorites.has(work.id);
   const thumbnailData = work.files.thumbnail.data_url || (work.files.thumbnail.url && !work.files.thumbnail.url.startsWith('work://') ? work.files.thumbnail.url : '');
@@ -224,10 +231,11 @@ function card(work, index) {
     : `<div class="thumb-art ${work.art || 'art-a'}"></div><div class="thumb-grid"></div>`;
   const storageHtml = Boolean(htmlFile.path || /^https?:\/\//.test(htmlFile.url || ''));
   const infoUrl = work.infoUrl || `work/${encodeURIComponent(work.id)}/`;
+  const viewUrl = workViewUrl(work.id);
   const openAction = storageHtml
-    ? `<button class="open-link open-html" data-open-html="${escapeHtml(work.id)}">作品を開く ↗</button>`
+    ? `<a class="open-link" href="${escapeHtml(viewUrl)}" target="_blank" rel="noopener">作品を開く ↗</a>`
     : htmlFile.url && !htmlFile.url.startsWith('work://')
-      ? `<a class="open-link" href="${escapeHtml(htmlFile.url)}" target="_blank">作品を開く ↗</a>`
+      ? `<a class="open-link" href="${escapeHtml(htmlFile.url)}" target="_blank" rel="noopener">作品を開く ↗</a>`
     : htmlFile.content || htmlFile.data_url
       ? `<button class="open-link open-html" data-open-html="${escapeHtml(work.id)}">作品を開く ↗</button>`
       : '<span class="open-link">プレビュー準備中</span>';
