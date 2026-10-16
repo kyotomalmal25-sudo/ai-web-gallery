@@ -366,6 +366,11 @@ function downloadText(fileName, content, mediaType = 'text/plain') {
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+function isPublishedHtml(work) {
+  return UUID_PATTERN.test(String(work.id || '')) && /^https?:\/\//.test(work.files.html.url || '');
+}
+
 function metadataDocument(work) {
   return {
     schema_version: work.schema_version,
@@ -377,7 +382,9 @@ function metadataDocument(work) {
     type: work.type,
     prompt: work.prompt,
     memo: work.memo,
-    html_url: work.files.html.url,
+    /* Storageの直リンクはcharset無しのtext/plainで返り日本語が化けるため、公開作品はWorkerのUTF-8配信を指す（work-worker.jsのmetadataForと同じ形） */
+    html_url: isPublishedHtml(work) ? publicWorkUrl(work.id, 'source.html') : work.files.html.url,
+    ...(isPublishedHtml(work) ? {storage_html_url: work.files.html.url} : {}),
     thumbnail_url: work.files.thumbnail.url,
     prompt_url: work.files.prompt.url,
     memo_url: work.files.memo.url,

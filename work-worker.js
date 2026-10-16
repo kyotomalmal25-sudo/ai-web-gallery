@@ -144,7 +144,10 @@ function metadataFor(work, id, env) {
     title: work[FIELD_MAP.title], ai: work[FIELD_MAP.ai], model: work[FIELD_MAP.model],
     date: work[FIELD_MAP.date], type: work[FIELD_MAP.type] || 'WEB WORK',
     prompt: work[FIELD_MAP.prompt] || '', memo: work[FIELD_MAP.memo] || '',
-    html_url: work[FIELD_MAP.htmlUrl] || workFileUrl(work, id, 'index.html', env),
+    // Supabase Storage returns HTML as text/plain without charset, so browsers guess Shift_JIS and garble Japanese.
+    // Point html_url at the Worker route that re-serves the same bytes as UTF-8 text.
+    html_url: `${base}source.html`,
+    storage_html_url: work[FIELD_MAP.htmlUrl] || workFileUrl(work, id, 'index.html', env),
     thumbnail_url: work[FIELD_MAP.thumbnailUrl] || workFileUrl(work, id, 'thumbnail.png', env),
     prompt_url: `${base}prompt.txt`, memo_url: `${base}memo.txt`,
     metadata_url: `${base}metadata.json`,
@@ -167,6 +170,19 @@ async function serveWorkHtml(work, id, env, request) {
     'content-type': 'text/html; charset=utf-8',
     'cache-control': 'public, max-age=60',
     'content-security-policy': 'sandbox allow-scripts allow-popups allow-forms allow-modals allow-pointer-lock allow-downloads',
+    'x-content-type-options': 'nosniff',
+    'access-control-allow-origin': '*',
+  }});
+}
+
+// Original HTML as plain text, explicitly UTF-8 (Storage omits the charset, which garbles Japanese in browsers).
+async function serveWorkSource(work, id, env, request) {
+  const upstream = await fetch(workFileUrl(work, id, 'index.html', env), {method: request.method === 'HEAD' ? 'HEAD' : 'GET'});
+  if (!upstream.ok) return response('Not Found', upstream.status === 404 ? 404 : 502, {'content-type': 'text/plain; charset=utf-8'});
+  return new Response(request.method === 'HEAD' ? null : upstream.body, {status: 200, headers: {
+    'content-type': 'text/plain; charset=utf-8',
+    'cache-control': 'public, max-age=60',
+    'content-security-policy': 'sandbox',
     'x-content-type-options': 'nosniff',
     'access-control-allow-origin': '*',
   }});
@@ -202,6 +218,7 @@ async function handleWork(request, env, url) {
     return response(work[key] || '', 200, {'content-type': SIDECAR_TYPES[fileName]});
   }
   if (fileName === 'index.html') return serveWorkHtml(work, id, env, request);
+  if (fileName === 'source.html') return serveWorkSource(work, id, env, request);
   return fetch(workFileUrl(work, id, fileName, env), {method: request.method, headers: request.headers});
 }
 
